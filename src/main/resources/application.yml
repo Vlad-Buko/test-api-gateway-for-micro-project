@@ -1,0 +1,41 @@
+server:
+  port: 80
+
+logging:
+  level:
+    reactor:
+      netty: INFO
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE
+
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        ssl:
+          use-insecure-trust-manager: true
+        routes:
+          - id: moto
+            uri: http://localhost:8084
+            predicates:
+              - Path=/motopage/**
+          - id: registration
+            uri: http://localhost:8084
+            predicates:
+              - Path =/registration
+            filters:
+              - RewritePath=/registration, /auth
+          - id: token
+            uri: http://localhost:8084
+            predicates:
+              - Path=/login
+            filters:
+              - RewritePath=/login, /auth/token
+          - id: help
+            uri: https://spring.io/guides
+            predicates:
+              - Path=/help
+            filters:
+              - RedirectTo=302, https://spring.io/guides
